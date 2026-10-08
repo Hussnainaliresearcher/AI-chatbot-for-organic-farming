@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+.container {
+  font-family: sans-serif;
+  max-width: 600px;
+  margin: 10px 0;
+}
+.input-group {
+  display: flex;
+  align-items: center;
+}
+#speechInput {
+  flex-grow: 1;
+  font-size: 1.2em;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  outline: none;
+}
+#micBtn {
+  font-size: 1.5em;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-left: none;
+  background-color: #eee;
+  cursor: pointer;
+  border-radius: 0 4px 4px 0;
+  transition: background-color 0.3s ease;
+}
+#micBtn.recording {
+  background-color: #e74c3c;
+  color: white;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="input-group">
+    <input type="text" id="speechInput" placeholder="Type or speak your query..." autocomplete="off" />
+    <button id="micBtn" title="Start/Stop Speaking">🎙️</button>
+  </div>
+</div>
+
+<script>
+const inputBox = document.getElementById('speechInput');
+const micBtn = document.getElementById('micBtn');
+
+let recognizing = false;
+let recognition;
+let confirmedTranscript = '';
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  micBtn.onclick = () => {
+    if (recognizing) {
+      recognition.stop();
+      sendTextToStreamlit(inputBox.value);
+    } else {
+      recognition.start();
+      confirmedTranscript = '';
+      inputBox.value = '';
+    }
+  };
+
+  recognition.onstart = () => {
+    recognizing = true;
+    micBtn.classList.add('recording');
+  };
+
+  recognition.onend = () => {
+    recognizing = false;
+    micBtn.classList.remove('recording');
+  };
+
+  recognition.onresult = (event) => {
+    let interimTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        confirmedTranscript += event.results[i][0].transcript + ' ';
+      } else {
+        interimTranscript += event.results[i][0].transcript;
+      }
+    }
+    inputBox.value = (confirmedTranscript + interimTranscript).trim();
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Speech recognition error:", event.error);
+  };
+
+  inputBox.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (recognizing) {
+        recognition.stop();
+      }
+      sendTextToStreamlit(inputBox.value);
+    }
+  });
+}
+
+function sendTextToStreamlit(text) {
+  Streamlit.setComponentValue(text);
+}
+
+// Initialize component
+window.addEventListener('load', () => {
+  Streamlit.setComponentReady();
+  Streamlit.setFrameHeight(document.body.scrollHeight);
+});
+</script>
+<script src="https://unpkg.com/streamlit-component-lib/dist/index.js"></script>
+</body>
+</html>
