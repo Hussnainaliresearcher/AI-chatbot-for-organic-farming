@@ -13,6 +13,7 @@ import folium
 import streamlit.components.v1 as components
 import ee
 from openai import OpenAI
+from google.oauth2.service_account import Credentials
 
 from floating_chat import render_floating_chat, reset_floating_chat_state
 
@@ -99,15 +100,23 @@ def _inject_satellite_css():
 @st.cache_resource
 def _init_gee(project_id: str):
     try:
-        ee.Initialize(project=project_id)
-        return True, "Initialized successfully."
-    except Exception:
+        # Check if running on Streamlit Cloud with configured secrets
+        if "gcp_service_account" in st.secrets:
+            key_dict = dict(st.secrets["gcp_service_account"])
+            credentials = Credentials.from_service_account_info(key_dict)
+            ee.Initialize(credentials, project=project_id)
+            return True, "Initialized securely via Service Account."
+        else:
+            # Fallback for local testing
+            ee.Initialize(project=project_id)
+            return True, "Initialized successfully."
+    except Exception as e:
         try:
             ee.Authenticate()
             ee.Initialize(project=project_id)
             return True, "Authenticated and initialized."
         except Exception as auth_err:
-            return False, str(auth_err)
+            return False, f"Cloud auth error: {e}. Local auth error: {auth_err}"
 
 def _get_llm_client() -> OpenAI:
     return OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
@@ -547,7 +556,6 @@ def render_satellite_main():
     )
 
 def reset_satellite_result_state():
-    # Optimised: Removed unused messy checks 
     for key in ["sat_result", "sat_llm_summary"]:
         if key in st.session_state:
             del st.session_state[key]
