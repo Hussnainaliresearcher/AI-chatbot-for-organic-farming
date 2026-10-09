@@ -104,7 +104,11 @@ def _init_gee(project_id: str):
         if "gcp_service_account" in st.secrets:
             key_dict = dict(st.secrets["gcp_service_account"])
             credentials = Credentials.from_service_account_info(key_dict)
-            ee.Initialize(credentials, project=project_id)
+            
+            # Apply the Earth Engine scope
+            scoped_credentials = credentials.with_scopes(['https://www.googleapis.com/auth/earthengine'])
+            
+            ee.Initialize(scoped_credentials, project=project_id)
             return True, "Initialized securely via Service Account."
         else:
             # Fallback for local testing
