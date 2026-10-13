@@ -125,13 +125,14 @@ def _init_gee(project_id: str):
 def _get_llm_client() -> OpenAI:
     return OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-_DEFAULT_GEE_PROJECT_ID = "auto-ml-copilot"
-
 def _get_gee_project_id() -> str:
     try:
-        return st.secrets.get("GEE_PROJECT_ID", _DEFAULT_GEE_PROJECT_ID)
+        # Dynamically read the project ID straight from the pasted secrets so it never mismatches
+        if "gcp_service_account" in st.secrets and "project_id" in st.secrets["gcp_service_account"]:
+            return st.secrets["gcp_service_account"]["project_id"]
+        return st.secrets.get("GEE_PROJECT_ID", "deforestation")
     except Exception:
-        return _DEFAULT_GEE_PROJECT_ID
+        return "deforestation"
 
 def _typing_bubble_html(label: str) -> str:
     return ('<div style="display:flex;justify-content:center;align-items:center;padding:40px 0;">'
