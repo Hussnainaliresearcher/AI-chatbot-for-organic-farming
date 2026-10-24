@@ -1,0 +1,13 @@
+   [gcp_service_account]
+   type = "service_account"
+   project_id = "project-440666e0-59d5-4bc6-80c"
+   private_key_id = "b3035a7c87b6df8ff3c3baac09508d9aedb03e5f"
+   private_key = "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDXZba6CEixaiIr\nFy3remrasrqPxo875mz+RjH8JHODpS/wAcP+3vQECUHLcVU9AZIxd0qc3/brtVje\nBFlE2X/Vf+O8bTN/WcIfxMsbQ29mdsQUHcWiqYS9SH6B2A5PSEVIXPHOO6EsqWaC\nYJ6VVvZ8XREZ+JchPgtQo5c7QjhDqu5tRqBvNbW+ENTBDCurwlfIP8tP8UkE3y+x\neYGN8eyCBmadNzgi/XfNt6wfgAIUKYIC/pBWQNm1m8Iep0YaIb09P0W9QsO0Ludg\nwHzn9VE5mwhqyGrBmNqO5sqbUpl2Z0VZHlq3c1PdvwDF3VCEvbfMj4PEl86u+X6c\noOnNKd8LAgMBAAECggEAZB41Btde4ogQhbLqdy+ZhznYGYgTf6YlNzNtfGN9Bc28\nMHTBozACf/XFjUiKdCbMyw1FsxEu9nR+cAPZcnUeRCCDvEuNyj3wS0/vkCaSGzBN\nB4SnHmpo9opBsxy32gYfnfkFs/RngBjlOuiqDYQ0Ya3oiwfPR3ZNUBgZ7UNkX56z\nKOLw/TZI9pYZZokFORgkQP+Jg3UEzGpBooS8enIxl2HREunDYQJCDDLnFKbhptkR\n2Ct2hIKOiwQcdHo+HXgW2sVASGEsTwcquYDYeSAiTY4J5t6Y7Vc7rSegiO4JPvXy\nz7dCgYD3JpYbsLqVDgCiQElg5rJOQKY3DNy56gk7AQKBgQD501HF/tyJuZCtTgG4\nGvtZRK4WG3qgXepEuN5OB5Kusq49AxTggSQPV+wBa71RkjUDZQB4HjX0anAVWzdw\nqICJ6uLhFCYb0RpT6+RUOWhYSlBPqkALWWPY/JFAU/wJgHACpJZtuB9sXEI0c6Y0\nny5SVRQVu6Cl87+CLgr45AGoQQKBgQDcuJAKfbvD4sIkSL+xNza4pqppOacUeqjC\n3HM1AsclqSDcZcmcgRO46lVDAGvbklHfgPzyJkA30trMz53djDN+Ohs4bO18vVnp\nDZiorHYeWgB8cB6v0PO7mO281PkPFjoS1t5mcb45ofMbKN2gPJOuItMBY3t2W9JE\nemL9cWiUSwKBgQCOOY3uSF/JUIlbAHPeGg5KDd2F3HL9ZTn/kbeNeKY7KqIjPePe\nw+aBja5gSLPpAnGH0zJnL9vLn+TbY6i2TFeRLNWpCc2APJTefgbpJB2RVg1OrT/0\nthkv6OnQU3/C8QnTl1vEbvQEvqk6LzTJ9G1sld7vWHfmwlOeixPYCgYfgQKBgDxQ\nvyPuygG0lKL/skqGMRDyknzgwVSqVDWzslPZJ3yWJCG2OwrmhvIwLw55LgA5kuAF\nypmNdF0M5Le1QImLR4MF8+xOb/N3dvtluMLXJgwTQjC/HtOiwQgRuV2xwUGrLEF7\nsBjEmlv7coiIeU/RXfXnFEw72EA2xVXrL+PcOtzTAoGBAIBwwebI+9EsIkJw2EQO\nqGxVtCE/xwGFSBYMC5sE7KcAsGb4GC1g2EAot1VfMNUQ0P2vXVgHVFSynRuEcr4i\n/JAEwL8xKC9TaHWqxjoutu44tOJEw1vsDvjfxtuZJxGI2+fRsXhhJsRiRGdYRc+N\nM3APzzSZQhM7kq8AZILkrAEP\n-----END PRIVATE KEY-----\n"
+   client_email = "streamlit-gee-access@project-440666e0-59d5-4bc6-80c.iam.gserviceaccount.com"
+   client_id = "110084590053862732387"
+   auth_uri = "https://accounts.google.com/o/oauth2/auth"
+   token_uri = "https://oauth2.googleapis.com/token"
+   auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
+   client_x509_cert_url =  "https://www.googleapis.com/robot/v1/metadata/x509/streamlit-gee-access%40project-440666e0-59d5-4bc6-80c.iam.gserviceaccount.com"
+   universe_domain = "googleapis.com"
+

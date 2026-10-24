@@ -6,7 +6,7 @@ from pakistan_context import get_pakistan_context_response, preload_pakistan_con
 from location_based_zone import (
     get_location_zone_response,
     preload_location_zone_data,
-    find_agro_zone_from_location,
+    find_agro_zone_from_location, 
     get_location_name,
     load_agro_zones_geojson,
     reset_location_memory,          # ← new import
@@ -25,6 +25,7 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 import textwrap
 import base64
+from pathlib import Path
 import folium
 from streamlit_folium import st_folium
 from streamlit_javascript import st_javascript
@@ -36,6 +37,18 @@ def get_base64_of_bin_file(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
     return base64.b64encode(data).decode()
+
+# ── animated header banner (SVG sits next to app.py) ─────────────────────────
+SHOW_HEADER_LOGO = False   # set True to bring the organization logo back (images.png)
+BANNER_SVG = Path(__file__).resolve().parent / "organic_farming_banner.svg"
+
+@st.cache_data(show_spinner=False)
+def get_banner_b64():
+    """Read the animated banner once and cache it; returns None if the file is missing."""
+    try:
+        return get_base64_of_bin_file(str(BANNER_SVG))
+    except Exception:
+        return None
 
 def get_location_details(lat, lon):
     district_name = "Unknown District"
@@ -71,18 +84,37 @@ def inject_custom_css():
             .fixed-header {
                 position: fixed; top: 0; left: 23rem; right: 2rem;
                 background-color: #a5d6a7; z-index: 1000;
-                padding: 2.25rem 1.25rem 0.75rem 0.15rem;
+                padding: 2.25rem 1.25rem 1.5rem 0.15rem;
                 box-shadow: 0 2px 6px rgba(0,0,0,0.08);
                 border-radius: 0 0 10px 10px; display: flex;
                 align-items: center; justify-content: space-between;
             }
-            .header-content { flex: 1; }
+            .header-content { flex: 0 1 auto; position: relative; z-index: 2; }
             .fixed-header h1 { margin-bottom: 0; font-size: 28px; color: #000; }
             .tag-label { font-size: 14px; font-weight: 600; color: #1b5e20; margin-bottom: -1px; margin-top: -22px; }
             .tag-strip { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: -10px; }
             .tag-pill { background: #f5f5f5; color: #000; padding: 6px 11px; border-radius: 16px; font-weight: 500; font-size: 14px; }
-            .header-logo { height: 68px; width: auto; max-width: 110px; object-fit: contain;margin-top: 25px; margin-left: 12px; border-radius: 6px; }
-            .main-content { margin-top: 130px; padding: 0 1rem; }
+            .header-logo { height: 68px; width: auto; max-width: 110px; object-fit: contain;margin-top: 25px; margin-left: 12px; border-radius: 6px; position: relative; z-index: 2; }
+
+            /* ── Animated header banner: fills all free space right of the title.
+                  object-fit: contain + bottom-right anchor = the WHOLE scene (satellite, sun, clouds…) always fits
+                  the header height, nothing is cropped. The scene fades itself at the edges. ── */
+            .header-art {
+                flex: 1 1 0; min-width: 0; max-width: 900px;
+                align-self: stretch;
+                margin: -2.25rem -1.25rem -1.5rem 0;   /* cancel header padding → art uses full header height */
+                position: relative; overflow: hidden; pointer-events: none;
+                border-radius: 0 0 10px 0;
+                container-type: inline-size;
+            }
+            .header-art img {
+                position: absolute; inset: 0; width: 100%; height: 100%;
+                object-fit: contain; object-position: right bottom; display: block;
+            }
+            /* not enough room → hide the picture instead of squeezing the title */
+            @container (max-width: 279px) { .header-art img { display: none; } }
+
+            .main-content { margin-top: 142px; padding: 0 1rem; }
             section[data-testid="stSidebar"] {
                 background-color: #a5d6a7 !important;
                 border-right: 1px solid #d2e9d1;
@@ -124,6 +156,8 @@ def inject_custom_css():
             @media (max-width: 768px) {
                 .main-container { margin-left: 0; }
                 .fixed-header { left: 0; right: 0; width: 100%; border-radius: 0; padding: 12px; }
+                .header-content { flex: 1; }
+                .header-art { display: none; }
                 .header-logo { height: 48px; margin-left: 6px; }
                 .fixed-header h1 { font-size: 22px; }
                 .main-content { margin-top: 120px; padding: 0 0.5rem; }
@@ -192,11 +226,23 @@ def render_chat_message(role, content, timestamp):
     """, unsafe_allow_html=True)
 
 def render_fixed_header():
-    try:
-        logo_base64 = get_base64_of_bin_file("images.png")
-        logo_html = f'<img src="data:image/png;base64,{logo_base64}" class="header-logo" alt="Organization Logo">'
-    except FileNotFoundError:
-        logo_html = '<div class="header-logo" style="background-color:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#666;">LOGO</div>'
+    logo_html = ""
+    if SHOW_HEADER_LOGO:
+        try:
+            logo_base64 = get_base64_of_bin_file("images.png")
+            logo_html = f'<img src="data:image/png;base64,{logo_base64}" class="header-logo" alt="Organization Logo">'
+        except FileNotFoundError:
+            logo_html = '<div class="header-logo" style="background-color:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#666;">LOGO</div>'
+
+    # Animated farm scene: satellite/NDVI/GPS, weather, solar → tubewell → canal, phone showing weather/video/answer.
+    # If the SVG file is missing the header simply renders without it.
+    banner_b64 = get_banner_b64()
+    if banner_b64:
+        art_html = (f'<div class="header-art"><img src="data:image/svg+xml;base64,{banner_b64}" '
+                    f'alt="" aria-hidden="true"></div>')
+    else:
+        art_html = '<div class="header-art"></div>'
+
     st.markdown(f"""
         <div class="fixed-header">
             <div class="header-content">
@@ -211,6 +257,7 @@ def render_fixed_header():
                     <span class="tag-pill">Pakistan Context</span>
                 </div>
             </div>
+            {art_html}
             {logo_html}
         </div>
     """, unsafe_allow_html=True)
@@ -543,6 +590,7 @@ def main():
                     st.video(video_url)
 
         # ── Step 5: persist both turns and rerun to rebuild full history ──
+        # this is our file that runs first
         st.session_state.chat_history.append({
             "role": "user",
             "content": user_question,
